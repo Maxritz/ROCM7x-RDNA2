@@ -5,66 +5,81 @@
 
 ## 🚀 Status: Successfully Built Components (v7.2.1-gfx1031)
 
-The following components have been successfully compiled for `gfx1031` and verified to generate valid ISA. This distribution uses a **Standard Unified Layout** mirroring official ROCm installs.
+This distribution provides a **Standard Unified Layout** mirroring official ROCm installs. The following components are fully functional and optimized for `gfx1031`:
 
 | Component | Category | Status |
 |-----------|----------|--------|
-| **LLVM / Clang++** | Compiler Toolchain | ✅ Patched & Verified |
-| **MIOpen** | Machine Learning Framework | ✅ Fully Functional (with CK) |
-| **Composable Kernel (CK)** | ML Kernels | ✅ Optimized for GFX1031 |
-| **rocBLAS** | Math / Dense Linear Algebra | ✅ Optimized with Tensile |
-| **hipBLASLt** | Math / Lightweight BLAS | ✅ Verified |
-| **rocFFT** | Math / Fourier Transforms | ✅ Verified |
-| **rocSPARSE** | Math / Sparse Operations | ✅ Verified |
-| **rocRAND** | Math / Random Numbers | ✅ Verified |
-| **rocSOLVER** | Math / Dense Solvers | ✅ Verified |
-| **rocWMMA** | Matrix Multi-Add | ✅ Optimized for RDNA2 |
-| **hipCUB / rocThrust** | Parallel Algorithms | ✅ Verified |
-| **hipBLAS / hipSOLVER** | HIP Wrappers | ✅ Verified |
+| **LLVM / Clang++** | Patcher Compiler (ISA v10.3.1) | ✅ Patched & Verified |
+| **MIOpen** | Deep Learning Framework / Operators | ✅ Fully Functional (with CK) |
+| **Composable Kernel** | Templated ML Kernels (Backends) | ✅ Optimized for GFX1031 |
+| **rocBLAS** | Dense Linear Algebra (Tensile Assembly) | ✅ Optimized Assembly Kernels |
+| **hipBLASLt** | Lightweight Gemm / Sparsity Support | ✅ Verified |
+| **rocFFT** | Fast Fourier Transforms | ✅ Verified |
+| **rocSPARSE** | Sparse Linear Algebra | ✅ Verified |
+| **rocRAND** | PRNG / QRNG Generators | ✅ Verified |
+| **rocSOLVER** | LAPACK-style Dense Solvers | ✅ Verified |
+| **rocWMMA** | Matrix Multiply-Add (RDNA2 optimized) | ✅ Verified |
+| **hipCUB / rocThrust**| Parallel Algorithms / Primitives | ✅ Verified |
+| **hipBLAS/hipSOLVER**| High-level HIP API Wrappers | ✅ Verified |
 
 ---
 
-## 📦 Binary Releases (Modular Install)
+## 📦 Binary Distributions (What's Published)
 
-To comply with GitHub's asset limits and provide flexibility, the distribution is split into modular archives. **To create a full install, download all parts and extract them into the same root folder (e.g., `C:\ROCM\7.2.1`).**
+To stay within GitHub limits while providing a complete toolchain, the release is split into 4 modular ZIP files. **A full installation requires all 4 archives extracted into the same root folder.**
 
-1.  **[ROCM_gfx1031_Runtime_v7.2.1.zip]**: Essential DLLs, `amdgcn` device bitcode, and CMake modules. (Required for all users).
-2.  **[ROCM_gfx1031_Compiler_v7.2.1_Part1.zip]** & **Part2.zip**: The full patched LLVM/Clang toolchain. (Required for developers).
-3.  **[ROCM_gfx1031_SDK_v7.2.1.zip]**: Header files and `.lib` import libraries. (Required for building projects).
+### 1. [ROCM_gfx1031_Runtime_v7.2.1.zip] (~282MB)
+- **Core DLLs**: `amdhip64.dll`, `rocblas.dll`, `MIOpen.dll`, etc.
+- **Device Libs**: Full `amdgcn/bitcode` directory (Required for kernel JIT).
+- **Environment**: Root CMake modules and `share/` configurations.
 
-### Installation Steps:
-1. Create a directory: `C:\ROCM\7.2.1`.
-2. Extract all 4 ZIP files into this directory.
-3. Add `C:\ROCM\7.2.1\bin` to your system `PATH`.
-4. Set `HIP_PATH=C:\ROCM\7.2.1` and `ROCM_PATH=C:\ROCM\7.2.1`.
+### 2. [ROCM_gfx1031_Compiler_v7.2.1_Part1.zip] & [Part2.zip] (~940MB total)
+- **Toolchain**: The patched `clang.exe`, `lld.exe`, `hipcc.exe`, and `amdgpu-arch`.
+- **LLVM Internal**: All necessary compiler headers and resource files (`lib/clang/`).
 
----
-
-## 🛠️ Replication Instructions (TheRock Superbuild)
-
-If you wish to compile from source using our patches:
-
-### 1. Environment Setup
-- Install **Visual Studio 2022** (with C++ and Windows SDK).
-- Install **Python 3.10+**, **CMake**, and **Ninja**.
-- Clone the [ROCm/TheRock](https://github.com/ROCm/TheRock) super-project.
-
-### 2. Apply Patches
-Overlay the `patches/` directory from this repository onto your ROCm source tree. Key patches include:
-- `AMDGPU.td` & `GCNProcessors.td` (LLVM) -> Explicitly adds `gfx1031` support.
-- `ROCMCheckTargetIds.cmake` -> Allows `gfx1031` as a valid build target.
-- `host_alloc.cpp` (hipBLAS) -> Fixes Windows `/proc/meminfo` crashes.
-
-### 3. Build Command
-```powershell
-python build_tools/build.py --amdgpu-targets gfx1031 --build-type Release MIOpen rocFFT rocSPARSE
-```
+### 3. [ROCM_gfx1031_SDK_v7.2.1.zip] (~37MB)
+- **Headers**: All C/C++ include files for the math and ML stack.
+- **Libraries**: `.lib` import libraries for MSVC linking.
 
 ---
 
-## ⚠️ Limitations & Notes
-- **Media Support**: `rocdecode` and `rocjpeg` are currently unsupported on Windows in the ROCm stack.
-- **Linker Flags**: These builds use `/FORCE:UNRESOLVED` for specific test utilities to bypass missing `OpenBLAS` symbols. This does NOT affect the performance or correctness of the core AI stack.
+## 🛠️ How to Use the Binaries (Installation)
+
+1.  **Extract**: Create a folder (e.g., `C:\ROCM\7.2.1`) and extract all 4 ZIPs into it. Ensure the `bin/`, `include/`, `lib/`, and `amdgcn/` folders are directly under the root.
+2.  **Path Setup**: Add `C:\ROCM\7.2.1\bin` to your System **PATH**.
+3.  **Environment Variables**:
+    - `HIP_PATH` = `C:\ROCM\7.2.1`
+    - `ROCM_PATH` = `C:\ROCM\7.2.1`
+    - `DEVICE_LIB_PATH` = `C:\ROCM\7.2.1\amdgcn\bitcode`
+4.  **Verify**: Open PowerShell and run:
+    ```powershell
+    hipcc --version
+    # You should see: AMD clang version 18.0.0 (or similar) / Target: x86_64-pc-windows-msvc
+    ```
 
 ---
-*Created with ❤️ for the RDNA2 Community.*
+
+## 🏗️ How to Use the Source (Reproduction)
+
+If you wish to build from source using the [ROCm/TheRock](https://github.com/ROCm/TheRock) superbuild:
+
+1.  **Clone the superbuild**:
+    `git clone https://github.com/ROCm/TheRock.git`
+2.  **Apply Patches**:
+    - Copy `patches/AMDGPU.td` and `GCNProcessors.td` to `llvm-project/llvm/lib/Target/AMDGPU/`.
+    - Copy `patches/ROCMCheckTargetIds.cmake` to `rocm-cmake/share/rocm-cmake/modules/`.
+    - Replace `rocm-libraries/projects/hipblas/clients/common/host_alloc.cpp` with our version.
+3.  **Initiate Build**:
+    ```powershell
+    # Build for GFX1031 target precisely
+    python build_tools/build.py --amdgpu-targets gfx1031 --build-type Release MIOpen rocFFT rocSPARSE
+    ```
+
+---
+
+## ⚠️ Limitations
+- **Video/Media**: `rocdecode` and `rocjpeg` remain as Linux dependencies.
+- **Verification Tools**: Client tests for `rocBLAS`/`hipBLASLt` are linked with `/FORCE:UNRESOLVED` to bypass `OpenBLAS` on Windows; this does not affect library performance.
+
+---
+*Maintained for the GFX1031 / RDNA2 Community.*
