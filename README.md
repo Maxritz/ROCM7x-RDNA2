@@ -26,35 +26,52 @@ This distribution provides a **Standard Unified Layout** mirroring official ROCm
 
 ## 📦 Binary Distributions (What's Published)
 
-To stay within GitHub limits while providing a complete toolchain, the release is split into 4 modular ZIP files. **A full installation requires all 4 archives extracted into the same root folder.**
+To comply with GitHub's asset limits and provide a clear installation path, the release is split into **4 modular ZIP files**. Extract all 4 into the same directory to create a complete ROCm environment.
 
 ### 1. [ROCM_gfx1031_Runtime_v7.2.1.zip] (~282MB)
-- **Core DLLs**: `amdhip64.dll`, `rocblas.dll`, `MIOpen.dll`, etc.
-- **Device Libs**: Full `amdgcn/bitcode` directory (Required for kernel JIT).
-- **Environment**: Root CMake modules and `share/` configurations.
+*   **Purpose**: Essential runtime components for users and developers.
+*   **Key Contents**: 
+    - `bin/*.dll`: Core runtimes (`amdhip64.dll`, `rocblas.dll`, `MIOpen.dll`, `rocfft.dll`, `rocsparse.dll`, `rocwmma.dll`, `rocrand.dll`, etc.).
+    - `amdgcn/bitcode/`: Device-side bitcode libraries (`hip.bc`, `ockl.bc`, `ocml.bc`) required for RDNA2 kernel execution.
+    - `share/` & `cmake/`: Root configuration modules for project discovery.
 
-### 2. [ROCM_gfx1031_Compiler_v7.2.1_Part1.zip] & [Part2.zip] (~940MB total)
-- **Toolchain**: The patched `clang.exe`, `lld.exe`, `hipcc.exe`, and `amdgpu-arch`.
-- **LLVM Internal**: All necessary compiler headers and resource files (`lib/clang/`).
+### 2. [ROCM_gfx1031_SDK_v7.2.1.zip] (~37MB)
+*   **Purpose**: Development headers and linking artifacts.
+*   **Key Contents**:
+    - `include/`: Full C++ header stack for the math and AI libraries.
+    - `lib/*.lib`: MSVC-compatible import libraries for all ROCm components.
 
-### 3. [ROCM_gfx1031_SDK_v7.2.1.zip] (~37MB)
-- **Headers**: All C/C++ include files for the math and ML stack.
-- **Libraries**: `.lib` import libraries for MSVC linking.
+### 3. [ROCM_gfx1031_Compiler_v7.2.1_Part1.zip] (~533MB)
+*   **Purpose**: Primary compiler toolchain (Part A).
+*   **Key Contents**: First half of the patched `bin/` executables, including `clang.exe`, `clang++.exe`, and `lld.exe`.
+
+### 4. [ROCM_gfx1031_Compiler_v7.2.1_Part2.zip] (~410MB)
+*   **Purpose**: Primary compiler toolchain (Part B).
+*   **Key Contents**:
+    - Remaining `bin/` utilities like `hipcc.exe`, `hipconfig.exe`, and `amdgpu-arch`.
+    - `lib/clang/`: Critical LLVM internal headers and resource files.
 
 ---
 
 ## 🛠️ How to Use the Binaries (Installation)
 
-1.  **Extract**: Create a folder (e.g., `C:\ROCM\7.2.1`) and extract all 4 ZIPs into it. Ensure the `bin/`, `include/`, `lib/`, and `amdgcn/` folders are directly under the root.
+1.  **Extract**: Create a folder (e.g., `C:\ROCM\7.2.1`) and extract **all 4 ZIP files** into it. 
+    > [!IMPORTANT]
+    > Ensure the `bin/`, `include/`, `lib/`, and `amdgcn/` folders are merged directly under the `C:\ROCM\7.2.1` root.
+
 2.  **Path Setup**: Add `C:\ROCM\7.2.1\bin` to your System **PATH**.
+
 3.  **Environment Variables**:
+    Set the following to ensure the toolchain finds the correct paths:
     - `HIP_PATH` = `C:\ROCM\7.2.1`
     - `ROCM_PATH` = `C:\ROCM\7.2.1`
     - `DEVICE_LIB_PATH` = `C:\ROCM\7.2.1\amdgcn\bitcode`
+    - `HIP_DEVICE_LIB_PATH` = `C:\ROCM\7.2.1\amdgcn\bitcode`
+
 4.  **Verify**: Open PowerShell and run:
     ```powershell
     hipcc --version
-    # You should see: AMD clang version 18.0.0 (or similar) / Target: x86_64-pc-windows-msvc
+    # Target should be: x86_64-pc-windows-msvc
     ```
 
 ---
